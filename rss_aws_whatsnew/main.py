@@ -37,10 +37,10 @@ def main():
     for entry in new_entries:
         if db.contains_service_word(entry[2]):
             print("Title:", entry[2])
-            print("Summary:", entry[4])
-            print("Published:", entry[7])
-            print("Link:", entry[13])
-            print("tag", entry[8])
+            #print("Summary:", entry[4])
+            #print("Published:", entry[7])
+            #print("Link:", entry[13])
+            #print("tag", entry[8])
             print("-" * 30)
 
     # delete old articols
