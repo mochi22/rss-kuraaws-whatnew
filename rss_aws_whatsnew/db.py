@@ -16,10 +16,22 @@ class FeedEntryDB:
         # "Managed Service for Prometheus", Grafana, Kafka -> Prometheus, Grafana, Kafka  # noqa: E501
         # Kinesis Analytics", "Kinesis Firehose", "Kinesis Streams" -> "Kinesis" # noqa: E501
         self.target_services = [
-            "Kinesis", "OpenSearch", "QuickSight", "Redshift", "Kendra",
-            "AppFlow", "DataZone", "Grafana", "Prometheus", "Kafka", "Neptune",
-            "CloudSearch", "Q Business",
-            "Supply Chain", "Honeycode", "Lookout for Metrics"
+            "Kinesis",
+            "OpenSearch",
+            "QuickSight",
+            "Redshift",
+            "Kendra",
+            "AppFlow",
+            "DataZone",
+            "Grafana",
+            "Prometheus",
+            "Kafka",
+            "Neptune",
+            "CloudSearch",
+            "Q Business",
+            "Supply Chain",
+            "Honeycode",
+            "Lookout for Metrics",
         ]
 
     def init_db(self):
@@ -30,7 +42,7 @@ class FeedEntryDB:
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
         c.execute(
-            '''
+            """
                 CREATE TABLE IF NOT EXISTS feed_entries
                     (
                         id TEXT PRIMARY KEY,
@@ -47,7 +59,7 @@ class FeedEntryDB:
                         links TEXT,
                         link TEXT
                     )
-            '''
+            """
         )
         conn.commit()
         conn.close()
@@ -60,33 +72,34 @@ class FeedEntryDB:
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
         for entry in feed.entries:
-            published_parsed = entry.get('published_parsed', None)
+            published_parsed = entry.get("published_parsed", None)
             if published_parsed:
                 published_parsed = datetime.fromtimestamp(
-                                    time.mktime(published_parsed)
-                                    ).strftime('%Y-%m-%d %H:%M:%S')
+                    time.mktime(published_parsed)
+                ).strftime("%Y-%m-%d %H:%M:%S")
             else:
-                published_parsed = ''
+                published_parsed = ""
             values = (
-                entry.get('id', ''),
-                entry.get('guidislink', ''),
-                entry.get('title', ''),
-                str(entry.get('title_detail', {})),
-                entry.get('summary', ''),
-                str(entry.get('summary_detail', {})),
-                entry.get('published', ''),
+                entry.get("id", ""),
+                entry.get("guidislink", ""),
+                entry.get("title", ""),
+                str(entry.get("title_detail", {})),
+                entry.get("summary", ""),
+                str(entry.get("summary_detail", {})),
+                entry.get("published", ""),
                 published_parsed,
-                str(entry.get('tags', [])),
-                str(entry.get('authors', [])),
-                entry.get('author', ''),
-                str(entry.get('author_detail', {})),
-                str(entry.get('links', [])),
-                entry.get('link', '')
+                str(entry.get("tags", [])),
+                str(entry.get("authors", [])),
+                entry.get("author", ""),
+                str(entry.get("author_detail", {})),
+                str(entry.get("links", [])),
+                entry.get("link", ""),
             )
             try:
                 c.execute(
-                        "INSERT OR REPLACE INTO feed_entries VALUES "
-                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", values
+                    "INSERT OR REPLACE INTO feed_entries VALUES "
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    values,
                 )
             except sqlite3.ProgrammingError as e:
                 print(f"データ形式が変更された可能性があります: {e}")
@@ -103,8 +116,8 @@ class FeedEntryDB:
         recent_date = datetime.now() - timedelta(days=days)
         print("recent_date:", recent_date)
         c.execute(
-                "SELECT * FROM feed_entries WHERE published_parsed >= ?",
-                (recent_date.strftime('%Y-%m-%d %H:%M:%S'),)
+            "SELECT * FROM feed_entries WHERE published_parsed >= ?",
+            (recent_date.strftime("%Y-%m-%d %H:%M:%S"),),
         )
         rows = c.fetchall()
         print("rows", len(rows))
@@ -119,15 +132,13 @@ class FeedEntryDB:
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
         #  get table length before deleting
-        c.execute(
-                "SELECT COUNT(*) FROM feed_entries"
-        )
+        c.execute("SELECT COUNT(*) FROM feed_entries")
         table_size_before_delete = c.fetchone()[0]
         recent_date = datetime.now() - timedelta(days=days)
         print("recent_date:", recent_date)
         c.execute(
-                "DELETE FROM feed_entries WHERE published_parsed < ?",
-                (recent_date.strftime('%Y-%m-%d %H:%M:%S'),)
+            "DELETE FROM feed_entries WHERE published_parsed < ?",
+            (recent_date.strftime("%Y-%m-%d %H:%M:%S"),),
         )
         conn.commit()
         #  get table length after deleting
@@ -138,7 +149,7 @@ class FeedEntryDB:
 
     def contains_service_word(self, text):
         for service_words in self.target_services:
-            pattern = r'\b' + re.escape(service_words) + r'\b'
+            pattern = r"\b" + re.escape(service_words) + r"\b"
             if re.search(pattern, text, re.IGNORECASE):
                 #  re.escapeを使って正規表現のメタ文字をエスケープしています。
                 #  \bで単語の境界を指定して、サービス名の単語が含まれる場合のみマッチ

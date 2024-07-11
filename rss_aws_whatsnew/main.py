@@ -12,7 +12,7 @@ def main():
     #  "https://aws.amazon.com/blogs/aws/feed/"
 
     path = "./"
-    db_name = path + 'aws_feed.db'
+    db_name = path + "aws_feed.db"
     if DEBUG:
         print("db path:", db_name)
 
