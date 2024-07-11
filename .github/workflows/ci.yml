@@ -10,8 +10,8 @@ on:
 
 jobs:
 
-  lint:
-    #runs-on: ubuntu-latest
+  check-lint-and-formatting:
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v3
@@ -30,8 +30,8 @@ jobs:
       run: poetry run flake8 .
 
   test:
-    needs: lint
-      #runs-on: ubuntu-latest
+    needs: check-lint-and-formatting
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
