@@ -1,11 +1,8 @@
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 import sqlite3
-from datetime import timedelta
 import datetime
-import feedparser
 import time
-
 import sys
 
 sys.path.append("/home/ec2-user/rss-aws-whatsnew/")

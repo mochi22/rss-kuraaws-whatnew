@@ -2,13 +2,14 @@
 name = "rss-aws-whatsnew"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["kuraryu <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 feedparser = "^6.0.11"
 black = "^24.4.2"
+flake8 = "^7.1.0"
 
 
 [build-system]
