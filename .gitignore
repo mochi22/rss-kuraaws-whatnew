@@ -1,0 +1,36 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Environment files
+.env
+.venv
+env/
+
+# Editor files
+.vscode/
+.idea/
+
+# SQLite database file
+*.db
+
+# Poetry files
+poetry.lock
+
+# Test files
+.coverage
+.pytest_cache/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+
+# macOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
