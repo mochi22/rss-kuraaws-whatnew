@@ -4,17 +4,17 @@ import sqlite3
 import datetime
 import time
 import sys
+from rss_aws_whatsnew import db
+
 
 sys.path.append("/home/ec2-user/rss-aws-whatsnew/")
-
-from rss_aws_whatsnew.db import FeedEntryDB
 
 
 class TestFeedEntryDB(unittest.TestCase):
 
     def setUp(self):
         self.db_name = "test.db"
-        self.db = FeedEntryDB(self.db_name)
+        self.db = db.FeedEntryDB(self.db_name)
         self.db.init_db()
         self.old_day = 7
         # print(f"Start test: {self._testMethodName}")  # テスト開始時の出力
@@ -34,7 +34,8 @@ class TestFeedEntryDB(unittest.TestCase):
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
         c.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='feed_entries'"
+            "SELECT name FROM sqlite_master "
+            "WHERE type='table' AND name='feed_entries'"
         )
         table_exists = c.fetchone() is not None
         conn.close()
@@ -142,7 +143,7 @@ class TestFeedEntryDB(unittest.TestCase):
         self.assertEqual(entry_count, 1)
 
     def test_contains_service_word(self):
-        self.assertTrue(self.db.contains_service_word("This is a Kinesis test"))
+        self.assertTrue(self.db.contains_service_word("Kinesis test"))
         self.assertTrue(self.db.contains_service_word("OpenSearch Service"))
         self.assertFalse(self.db.contains_service_word("No service name"))
 
