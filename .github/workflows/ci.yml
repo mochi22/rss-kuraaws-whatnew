@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - gomimain
   pull_request:
     branches:
-      - main
+      - gomimain
 
 jobs:
 
