@@ -1,28 +1,44 @@
 name: Deploy to AWS Lambda
+
 on:
   push:
     branches:
-      - main  # または、デプロイするブランチ名
+      - main
 
 jobs:
+
   deploy:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.8.3 # Poetryのバージョン
+
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      run: poetry install
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
     - name: Deploy to Lambda
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
         LAMBDA_FUNCTION_NAME: ${{ secrets.LAMBDA_FUNCTION_NAME }}
+        DYNAMODB_TABLE_NAME: ${{ secrets.DYNAMODB_TABLE_NAME }}
       run: |
-        zip -r deploy.zip .
+        poetry build
+        zip -r deploy.zip dist/*
         aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://deploy.zip
+        aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --environment "Variables={DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE_NAME,LINE_NOTIFY_TOKEN=${{ secrets.LINE_NOTIFY_TOKEN }}}"
