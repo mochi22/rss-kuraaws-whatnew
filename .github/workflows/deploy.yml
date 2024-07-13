@@ -43,7 +43,7 @@ jobs:
         pip install -r requirements.txt --target ./package # import dependencies
         ls
         echo ok check
-        zip -r deploy.zip packege
+        zip -r deploy.zip package
         echo zipped package
         zip -r deploy.zip rss_aws_whatsnew
         echo zipped code
