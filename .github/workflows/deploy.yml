@@ -46,7 +46,3 @@ jobs:
         cd ../
         aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://deploy.zip
         aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --environment "Variables={LINE_NOTIFY_TOKEN=${{ secrets.LINE_NOTIFY_TOKEN }}}"
-        continue-on-error: true
-        with:
-          max_retry: 5
-          retry_delay: 15s
