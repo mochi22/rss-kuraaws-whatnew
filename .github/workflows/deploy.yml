@@ -42,9 +42,7 @@ jobs:
         poetry export --format requirements.txt --without-hashes > requirements.txt #  export dependencies from poetry
         pip install -r requirements.txt --target ./package # import dependencies
         ls
-        cd packege
-        zip -r ../deploy.zip .
-        cd ..
+        zip -r deploy.zip ./packege
         zip -r deploy.zip rss_aws_whatsnew/*
         aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://deploy.zip
         aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --environment "Variables={DYNAMODB_TABLE_NAME=$DYNAMODB_TABLE_NAME,LINE_NOTIFY_TOKEN=${{ secrets.LINE_NOTIFY_TOKEN }}}"
