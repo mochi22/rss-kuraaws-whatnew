@@ -1,4 +1,5 @@
 import boto3
+import time
 from datetime import datetime, timedelta
 import re
 
@@ -10,9 +11,11 @@ class FeedEntryDB:
     def __init__(self, table_name):
         self.table_name = table_name
         self.dynamodb = boto3.resource('dynamodb')
-        try:
+        # テーブル名のリストを取得
+        table_names = [table.name for table in self.dynamodb.tables.all()]
+        if table_name in table_names:
             self.table = self.dynamodb.Table(self.table_name)
-        except:
+        else:
             self.table = self.get_or_create_table(self.table_name)
         self.target_services = [
             "Kinesis",

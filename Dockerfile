@@ -14,4 +14,4 @@ RUN poetry config virtualenvs.create false \
   && poetry install --no-dev --no-root
 
 # Lambda関数のエントリーポイントを設定
-CMD ["rss_aws_whatsnew.main.lambda_handler"]
+CMD ["main.lambda_handler"]
