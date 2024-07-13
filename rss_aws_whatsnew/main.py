@@ -25,16 +25,20 @@ def lambda_handler(event, context):
     new_entries = db.get_recent_entries(8)
 
     for entry in new_entries:
-        if db.contains_service_word(entry[2]):
-            print("Title:", entry[2])
+        print(entry.keys())
+        if db.contains_service_word(entry['title']):
+            print("Title:", entry['title'])
             #  print("Summary:", entry[4])
             #  print("Published:", entry[7])
             #  print("Link:", entry[13])
             #  print("tag", entry[8])
             print("-" * 30)
             # Line Notifyで通知
-            message = f"Title: {entry[2]}\nSummary: {entry[4]}\nPublished: {entry[7]}\nLink: {entry[13]}\n"
-            send_line_notify(line_notify_token, message)
+            message = f"Title: {entry['title']}\nSummary: {entry['summary']}\nPublished: {entry['published']}\nLink: {entry['link']}\n"
+            print("message:", message)
+            message2 = f"Title: {entry['title']}\nLink: {entry['link']}\n"
+            print("message2:", message2)
+            send_line_notify(line_notify_token, message2)
     #  delete old articols
     #  db.delete_old_entries(days=10)
     return {
@@ -44,9 +48,14 @@ def lambda_handler(event, context):
 
 def send_line_notify(token, message):
     import requests
+    print("token:", token)
     headers = {
         "Authorization": "Bearer " + token,
         "Content-Type": "application/x-www-form-urlencoded"
     }
     params = {"message": message}
-    requests.post("https://notify-api.line.me/api/notify", headers=headers, params=params)
+    try:
+        requests.post("https://notify-api.line.me/api/notify", headers=headers, params=params)
+        print("done send line notify")
+    except:
+        print("missed send line notify")
