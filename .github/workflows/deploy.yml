@@ -40,6 +40,8 @@ jobs:
         #poetry build  #  deploy lambda, so don't use poetry build
         poetry export --format requirements.txt --without-hashes > requirements.txt #  export dependencies from poetry
         pip install -r requirements.txt --target rss_aws_whatsnew/package # import dependencies
-        zip -r deploy.zip rss_aws_whatsnew
+        cd rss_aws_whatsnew
+        zip -r ../deploy.zip .
+        cd ..
         aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://deploy.zip
         aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --environment "Variables={LINE_NOTIFY_TOKEN=${{ secrets.LINE_NOTIFY_TOKEN }}}"
