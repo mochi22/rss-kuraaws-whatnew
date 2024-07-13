@@ -8,8 +8,12 @@ def lambda_handler(event, context):
     feed_url = "https://aws.amazon.com/new/feed"
     #  "https://aws.amazon.com/jp/about-aws/whats-new/recent/feed/"
     #  "https://aws.amazon.com/blogs/aws/feed/"
-    line_notify_token = os.environ.get('LINE_NOTIFY_TOKEN')
-    
+    #line_notify_token = os.environ.get('LINE_NOTIFY_TOKEN')
+    api_token = get_api_token('LINE_NOTIFY_TOKEN')
+    if api_token:
+        print(f"Decrypted API token: {api_token}")
+    else:
+        print("Failed to decrypt API token.")
     db_name = "aws_whatsnew_feed"
     
     #  create db object and init db
@@ -45,6 +49,21 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': 'Successfully processed feed entries.'
     }
+
+def get_api_token(encrypted_token_name):
+    encrypted_token = os.environ.get(encrypted_token_name)
+    if not encrypted_token:
+        raise ValueError(f"{encrypted_token_name} environment variable is required.")
+
+    kms_client = boto3.client('kms')
+    try:
+        decrypted_token = kms_client.decrypt(
+            CiphertextBlob=base64.b64decode(encrypted_token)
+        )['Plaintext']
+        return decrypted_token.decode('utf-8')
+    except Exception as e:
+        print(f"Error decrypting API token: {e}")
+        return None
 
 def send_line_notify(token, message):
     import requests
