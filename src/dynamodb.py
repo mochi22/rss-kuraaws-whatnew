@@ -1,4 +1,5 @@
 import boto3
+import time
 from datetime import datetime, timedelta
 import re
 from typing import List
@@ -47,15 +48,27 @@ class FeedEntryDB:
             table = self.dynamodb.Table(table_name)
             print(f"Table '{table_name}' already exists.")
         else:
+            # fmt: off
             table = self.dynamodb.create_table(
                 TableName=table_name,
-                KeySchema=[{"AttributeName": "id", "KeyType": "HASH"}],
-                AttributeDefinitions=[{"AttributeName": "id", "AttributeType": "S"}],
+                KeySchema=[
+                    {
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
+                    }
+                ],
+                AttributeDefinitions=[
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    }
+                ],
                 ProvisionedThroughput={
                     "ReadCapacityUnits": 5,
                     "WriteCapacityUnits": 5,
                 },
             )
+            # fmt: on
             table.wait_until_exists()
             print(f"Table '{table_name}' created successfully.")
         return table
@@ -68,7 +81,11 @@ class FeedEntryDB:
             feed: RSS feed object.
         """
         for entry in feed.entries:
-            published_parsed = self.parse_published_date(entry.get("published_parsed"))
+            # fmt: off
+            published_parsed = self.parse_published_date(
+                    entry.get("published_parsed")
+            )
+            # fmt: on
             item = {
                 "id": entry.get("id", ""),
                 "guidislink": entry.get("guidislink", ""),
@@ -101,11 +118,12 @@ class FeedEntryDB:
         Returns:
             str: Formatted published date string.
         """
-        if published_parsed:
-            return datetime.fromtimestamp(time.mktime(published_parsed)).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-        return ""
+        if not published_parsed:
+            return ""
+        timestamp = time.mktime(published_parsed)
+        datetime_obj = datetime.fromtimestamp(timestamp)
+        formatted_date = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+        return formatted_date
 
     def get_recent_entries(self, days: int = 7) -> List:
         """

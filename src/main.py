@@ -71,7 +71,7 @@ def get_enctypted_env_variables(encrypted_token_name: str) -> Optional[str]:
     """
     encrypted_token = os.environ.get(encrypted_token_name)
     if not encrypted_token:
-        raise ValueError(f"{encrypted_token_name} environment variable is required.")
+        raise ValueError(f"{encrypted_token_name} env variable is required")
 
     kms_client = boto3.client("kms")
     try:

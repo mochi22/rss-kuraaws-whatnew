@@ -3,11 +3,6 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
 from moto import mock_aws as mock_dynamodb
 import boto3
-import os
-import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-# FeedEntryDBクラスをインポート
 from rss_aws_whatsnew.src.dynamodb import FeedEntryDB
 
 
@@ -20,14 +15,29 @@ class TestFeedEntryDB(unittest.TestCase):
         self.mock_dynamodb.start()
         self.dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
 
+        # fmt: off
         # テスト用のテーブル作成
         self.table_name = "test-table"
         self.table = self.dynamodb.create_table(
             TableName=self.table_name,
-            KeySchema=[{"AttributeName": "id", "KeyType": "HASH"}],
-            AttributeDefinitions=[{"AttributeName": "id", "AttributeType": "S"}],
-            ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
+            KeySchema=[
+                {
+                    "AttributeName": "id",
+                    "KeyType": "HASH"
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    "AttributeName": "id",
+                    "AttributeType": "S"
+                }
+            ],
+            ProvisionedThroughput={
+                "ReadCapacityUnits": 5,
+                "WriteCapacityUnits": 5
+            },
         )
+        # fmt: on
         self.table.meta.client.get_waiter("table_exists").wait(
             TableName=self.table_name
         )
@@ -56,6 +66,7 @@ class TestFeedEntryDB(unittest.TestCase):
     def test_save_entries(self):
         # モックのRSSフィードエントリ
         mock_feed = MagicMock()
+        # fmt: off
         mock_feed.entries = [
             {
                 "id": "1",
@@ -68,6 +79,7 @@ class TestFeedEntryDB(unittest.TestCase):
                 "published_parsed": (2023, 5, 2, 12, 0, 0, 0, 0, 0),
             },
         ]
+        # fmt: on
 
         # エントリの保存
         self.feed_entry_db.save_entries(mock_feed)
