@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rss-aws-whatsnew"
+name = "rss_aws_whatsnew"
 version = "0.1.0"
 description = ""
 authors = ["kuraryu <you@example.com>"]
@@ -8,10 +8,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 feedparser = "^6.0.11"
-black = "^24.4.2"
 flake8 = "^7.1.0"
 requests = "^2.32.3"
-boto3 = "^1.34.144"
+black = "^24.4.2"
 moto = "^5.0.11"
 
 
