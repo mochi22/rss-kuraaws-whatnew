@@ -105,14 +105,28 @@ class TestFeedEntryDB(unittest.TestCase):
         # fmt: on
 
         # エントリの保存
-        self.feed_entry_db.save_entries(mock_feed)
+        new_entries = self.feed_entry_db.save_entries(mock_feed)
 
         # テーブルからデータを取得
         response = self.table.scan()
-        print("res", response)
         items = response["Items"]
 
-        # エントリが正しく保存されていることを確認
+        # 新規エントリのみが返されていることを確認
+        self.assertEqual(len(new_entries), 2)
+        self.assertEqual(new_entries[0]["id"], "1")
+        self.assertEqual(new_entries[0]["title"], "Test Entry 1")
+        self.assertEqual(
+            new_entries[0]["published_parsed"].strftime("%Y-%m-%d %H:%M:%S"),
+            "2023-01-01 00:00:00",
+        )
+        self.assertEqual(new_entries[1]["id"], "2")
+        self.assertEqual(new_entries[1]["title"], "Test Entry 2")
+        self.assertEqual(
+            new_entries[1]["published_parsed"].strftime("%Y-%m-%d %H:%M:%S"),
+            "2024-01-01 00:00:00",
+        )
+
+        # テーブルにすべてのエントリが保存されていることを確認
         self.assertEqual(len(items), 2)
         self.assertEqual(items[0]["id"], "1")
         self.assertEqual(items[0]["title"], "Test Entry 1")

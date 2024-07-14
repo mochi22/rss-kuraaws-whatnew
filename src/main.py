@@ -10,35 +10,26 @@ from rss_aws_whatsnew.dynamodb import FeedEntryDB
 #  RSSフィードを取得し、データベースに保存
 def lambda_handler(event, context):
     feed_url = "https://aws.amazon.com/new/feed"
-    #  "https://aws.amazon.com/jp/about-aws/whats-new/recent/feed/"
-    #  "https://aws.amazon.com/blogs/aws/feed/"
-    # line_notify_token = os.environ.get('LINE_NOTIFY_TOKEN')
     line_notify_token = get_enctypted_env_variables("LINE_NOTIFY_TOKEN")
     if line_notify_token:
         print(f"Decrypted API token: {line_notify_token}")
     else:
         print("Failed to decrypt API token.", line_notify_token)
+
     db_name = "aws_whatsnew_feed"
 
     #  create db object and init db
     db = FeedEntryDB(db_name)
-
     #  get rss feed
     feed = feedparser.parse(feed_url)
-
     #  insert articols
-    db.save_entries(feed)
-
+    new_entries = db.save_entries(feed)
     #  get newest articles
-    new_entries = db.get_recent_entries(8)
+    # new_entries = db.get_recent_entries(8)
 
     for entry in new_entries:
         if db.contains_service_word(entry["title"]):
             print("Title:", entry["title"])
-            #  print("Summary:", entry[4])
-            #  print("Published:", entry[7])
-            #  print("Link:", entry[13])
-            #  print("tag", entry[8])
             print("-" * 30)
             # Line Notifyで通知
             """

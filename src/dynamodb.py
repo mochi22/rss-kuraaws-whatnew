@@ -73,7 +73,7 @@ class FeedEntryDB:
             print(f"Table '{table_name}' created successfully.")
         return table
 
-    def save_entries(self, feed) -> None:
+    def save_entries(self, feed) -> List:
         """
         Load RSS feed data and insert into the DynamoDB table.
 
@@ -102,10 +102,20 @@ class FeedEntryDB:
                 "links": str(entry.get("links", [])),
                 "link": entry.get("link", ""),
             }
+
             try:
-                self.table.put_item(Item=item)
+                # fmt: off
+                response = self.table.put_item(
+                    Item=item,
+                    ReturnValues="ALL_OLD"
+                )
+                # fmt: on
+                new_entries = []
+                if not response.get("Attributes"):
+                    new_entries.append(item)
             except Exception as e:
                 print(f"データ形式が変更された可能性があります: {e}")
+        return new_entries
 
     @staticmethod
     def parse_published_date(published_parsed) -> str:
