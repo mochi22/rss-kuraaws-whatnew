@@ -1,11 +1,13 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
-import boto3
 from moto import mock_aws
-
+import boto3
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # FeedEntryDBクラスをインポート
-from rss_aws_whatsnew import FeedEntryDB
+from rss_aws_whatsnew.src.dynamoDB import FeedEntryDB
 
 # テストケースの定義
 class TestFeedEntryDB(unittest.TestCase):

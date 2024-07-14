@@ -4,7 +4,7 @@ import feedparser
 import os
 import base64
 import requests
-from dynamodb import FeedEntryDB
+from rss_aws_whatsnew.dynamodb import FeedEntryDB
 
 
 #  RSSフィードを取得し、データベースに保存
