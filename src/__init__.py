@@ -1,0 +1,1 @@
+from rss_aws_whatsnew.rss_aws_whatnew.dynamoDB import FeedEntryDB
