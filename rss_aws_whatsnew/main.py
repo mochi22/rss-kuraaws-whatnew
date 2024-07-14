@@ -1,5 +1,8 @@
+import boto3
+from typing import Optional
 import feedparser
 import os
+import base64
 from dynamodb import FeedEntryDB
 
 
@@ -9,11 +12,11 @@ def lambda_handler(event, context):
     #  "https://aws.amazon.com/jp/about-aws/whats-new/recent/feed/"
     #  "https://aws.amazon.com/blogs/aws/feed/"
     #line_notify_token = os.environ.get('LINE_NOTIFY_TOKEN')
-    api_token = get_api_token('LINE_NOTIFY_TOKEN')
-    if api_token:
-        print(f"Decrypted API token: {api_token}")
+    line_notify_token = get_enctypted_env_variables('LINE_NOTIFY_TOKEN')
+    if line_notify_token:
+        print(f"Decrypted API token: {line_notify_token}")
     else:
-        print("Failed to decrypt API token.")
+        print("Failed to decrypt API token.", line_notify_token)
     db_name = "aws_whatsnew_feed"
     
     #  create db object and init db
@@ -29,7 +32,6 @@ def lambda_handler(event, context):
     new_entries = db.get_recent_entries(8)
 
     for entry in new_entries:
-        print(entry.keys())
         if db.contains_service_word(entry['title']):
             print("Title:", entry['title'])
             #  print("Summary:", entry[4])
@@ -50,19 +52,30 @@ def lambda_handler(event, context):
         'body': 'Successfully processed feed entries.'
     }
 
-def get_api_token(encrypted_token_name):
+def get_enctypted_env_variables(encrypted_token_name: str) -> Optional[str]:
+    """
+    Decrypts the encrypted value of an environment variable.
+
+    Args:
+        encrypted_token_name (str): The name of the environment variable containing the encrypted value.
+
+    Returns:
+        Optional[str]: The decrypted value. Returns None if decryption fails.
+    """
     encrypted_token = os.environ.get(encrypted_token_name)
     if not encrypted_token:
         raise ValueError(f"{encrypted_token_name} environment variable is required.")
 
     kms_client = boto3.client('kms')
     try:
+        decoded_token = base64.b64decode(encrypted_token)
         decrypted_token = kms_client.decrypt(
-            CiphertextBlob=base64.b64decode(encrypted_token)
-        )['Plaintext']
-        return decrypted_token.decode('utf-8')
+            CiphertextBlob=decoded_token,
+            EncryptionContext={'LambdaFunctionName': os.environ['AWS_LAMBDA_FUNCTION_NAME']}
+        )['Plaintext'].decode('utf-8')
+        return decrypted_token
     except Exception as e:
-        print(f"Error decrypting API token: {e}")
+        print(f"Error decrypting token: {e}")
         return None
 
 def send_line_notify(token, message):
