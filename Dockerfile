@@ -5,7 +5,7 @@ FROM public.ecr.aws/lambda/python:3.10
 RUN pip install poetry
 
 # コードをコンテナにコピー
-COPY rss_aws_whatsnew/ ${LAMBDA_TASK_ROOT}
+COPY src/ ${LAMBDA_TASK_ROOT}
 COPY poetry.lock pyproject.toml ./
 
 # 依存関係をインストール
