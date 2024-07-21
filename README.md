@@ -10,3 +10,4 @@ This is an app that performs batch processing every day and notifies me with Lin
 - DynamoDB(DB)
 - Github Actions(CI/CD)
 - Docker(Container)
+- Line Notify
