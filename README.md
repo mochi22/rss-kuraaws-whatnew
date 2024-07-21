@@ -9,3 +9,4 @@ This is an app that performs batch processing every day and notifies me with Lin
 - Lambda(backend)
 - DynamoDB(DB)
 - Github Actions(CI/CD)
+- Docker(Container)
